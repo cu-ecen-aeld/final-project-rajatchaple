@@ -4,15 +4,21 @@ This repository contains the final project submission by Sundar Krishnakumar and
 
 
 
-### Wiki Page
+### Project Overview
 
-[Project overview Wiki Page](https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/wiki/Project-Overview)
+[Project overview Page](https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/wiki/Project-Overview)
 
 
 
 ### Project Schedule
 
 [Project Schedule Page](https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/wiki/Project-Schedule)  
+
+### Project Vocabulary
+
+[Vocabulary Page](https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/wiki/Vocabulary)  
+
+
 
 
 
