@@ -4,7 +4,7 @@ This repository contains the final project submission by Sundar Krishnakumar and
 
 
 
-### Project Overview 
+### Project Overview
 
 [Project overview Page](https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/wiki/Project-Overview)
 
