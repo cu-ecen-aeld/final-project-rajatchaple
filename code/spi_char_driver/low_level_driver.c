@@ -6,8 +6,8 @@
 #include <linux/slab.h>
 
 
-#include "mcp3002.h"
-#include "mcspi.h"
+#include "adc_char_driver.h"
+#include "low_level_driver.h"
 
 struct omap2_mcspi mcspi;
 
@@ -135,13 +135,9 @@ static void omap2_mcspi_set_enable(struct omap2_mcspi *mcspi, int enable)
 
 
 
-int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff);
+int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
 {
-	if (buff = NULL)
-	{
-		PDEBUG("buff is NULL\n");
-		return -ENOMEM;
-	}
+	
 
 	void __iomem        *base = mcspi->base;
     void __iomem        *tx_reg;
@@ -149,6 +145,12 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff);
     void __iomem        *chstat_reg;
     u8 rx;
 	u8 tx = *buff;
+
+	if (buff == NULL)
+	{
+		PDEBUG("buff is NULL\n");
+		return -ENOMEM;
+	}
 
 	PDEBUG("\n###### In %s ######\n", __func__);
 
@@ -187,7 +189,7 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff);
 
 	// Read a bytes of data into the rx buffer
 	rx = __raw_readl(rx_reg);
-	PDEBUG("\nrx[%d] = %x\n", idx, rx);
+	PDEBUG("\nrx = %x\n", rx);
 
 
 	// Disable the cs force
