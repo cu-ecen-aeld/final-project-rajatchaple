@@ -4,7 +4,7 @@ The client driver can also be called as character driver.
 
 File name: mcp3002.c
 
-Link: @@@@
+Link: https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/mcp3002.c
 
 
 ## Master driver
@@ -13,11 +13,11 @@ The master driver can be also called as the low-level driver/platform driver.
 
 File name: mcspi.c
 
-Link: @@@@
+Link: https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/mcspi.c
 
 ## Code organization
 
-@@image@@
+![simple-driver-1]()
 
 The 'Simple driver Part 1' model shown above has these two major problems - 
 
