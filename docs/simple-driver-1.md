@@ -17,7 +17,7 @@ Link: https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/m
 
 ## Code organization
 
-![simple-driver-1]()
+![simple-driver-1](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/simple-driver-1.jpg)
 
 The 'Simple driver Part 1' model shown above has these two major problems - 
 
