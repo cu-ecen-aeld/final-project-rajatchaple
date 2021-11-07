@@ -1,0 +1,8 @@
+*.o
+crosstool-ng
+.vscode/
+*.dwo
+*.order
+*.symvers
+*.dwo
+*.mod
