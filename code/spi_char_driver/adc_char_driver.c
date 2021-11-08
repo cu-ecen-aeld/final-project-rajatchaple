@@ -40,7 +40,7 @@ static int my_adc_open(struct inode *i, struct file *f)
 /***********************************************************************************
  * adc char driver function for (userspace) read call
  * *********************************************************************************/
-static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t *off)
+static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t *f_pos)
 {
 	
 	int read_data = 0;
@@ -56,7 +56,7 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 	{
 		PDEBUG("Error Reading data from adc sensor");
 	}
-	read_data = return_byte << 8
+	read_data = return_byte << 8;
 	
 	adc_buf = 0;	//for receiving B7 to B0
 	return_byte = spi_rw(mcspi, &adc_buf);	
