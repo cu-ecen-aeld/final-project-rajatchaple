@@ -93,7 +93,7 @@ int omap2_mcspi_setup_transfer(struct omap2_mcspi *mcspi)
 	u32 l = 0, div = 0;
 
 	// Variable parameters - Should be set to match ADC chip's requirements
-    u32 speed_hz = 400000; // 400KHz
+    u32 speed_hz = 100000; // 100KHz
     u8 word_len = 8;
 
 	PDEBUG("\n###### In %s ######\n", __func__);
