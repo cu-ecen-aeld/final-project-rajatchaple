@@ -66,19 +66,27 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 	read_data |= read_data;	//reading 9th and th bit sent from SPI
 
 
-	//copying from kernel space to user space
-	rc = copy_to_user(buf, &read_data, 2);	//2 bytes of data needs to be sent back to user
-	if (rc)
-	{
-		PDEBUG("error: copy_to_user %ld", rc);
-		return -EFAULT;
+	if (*f_pos == 0) {
+		//copying from kernel space to user space
+		rc = copy_to_user(buf, &read_data, 2);	//2 bytes of data needs to be sent back to user
+		if (rc)
+		{
+			PDEBUG("error: copy_to_user %ld", rc);
+			return -EFAULT;
+			
+		}
+		else
+		{
+			*f_pos = 2; // We transferred 1 bytes to user space
+			return 2; // 2 bytes transferred. rx_buff
+		}		
 		
+	} 
+	else {
+		*f_pos = 0;
+		return 0;
 	}
-	else
-	{
-		return 2;
-	}
-	
+
 	return 0;
 }
 
