@@ -25,4 +25,4 @@ The 'Simple driver Part 1' model shown above has these two major problems -
  
  **Solution**: The mcSPI register addresses and SPI pin configurations can be moved to a special file called Device Tree (DT). The DT contains data structures which the linux kernel developer uses to describe all the required peripherals of the board. This will be implemented in the next stage of the driver design 'Simple driver Part 2'.
 
-  - The character driver and low level driver are tightly oupled. Any change on one code will affect the other. This would be dealt in the next phase.
+  - The character driver and low level driver are tightly coupled. Any change on one code will affect the other. This would be dealt in the next phase.
