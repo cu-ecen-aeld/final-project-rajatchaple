@@ -6,3 +6,5 @@ crosstool-ng
 *.symvers
 *.dwo
 *.mod
+*.cmd
+*.ko

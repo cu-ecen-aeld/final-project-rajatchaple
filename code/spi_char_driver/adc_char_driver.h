@@ -6,6 +6,8 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
+#include <linux/kernel.h> // for sprintf()
+#include <linux/string.h>
 
 #include "low_level_driver.h"
 

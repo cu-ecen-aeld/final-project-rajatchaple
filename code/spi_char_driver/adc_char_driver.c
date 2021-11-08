@@ -43,14 +43,15 @@ static int my_adc_open(struct inode *i, struct file *f)
 static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t *f_pos)
 {
 	
-	int read_data = 0;
+	unsigned int read_data = 0;
 	int return_byte = 0;
 	unsigned long rc = 0;
 	uint8_t adc_buf = 0;
+	char adc_buffchar[10] = {0};
+	uint8_t buffchar_len = 0;
+
 	PDEBUG("Reading data from adc sensor");
 	adc_buf = 0x68;	//0110 1000 	0SCC MN98 where S is start bit, CC is channel select, M is for MSB First bit
-
-	
 
 
 	if (*f_pos == 0) {
@@ -61,7 +62,7 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 		{
 			PDEBUG("Error: Reading data from adc sensor");
 		}
-		read_data = return_byte << 8;
+		read_data = ((return_byte & 0xFF) << 2);
 		
 		adc_buf = 0;	//for receiving B7 to B0
 		return_byte = spi_rw(mcspi, &adc_buf);	
@@ -69,10 +70,14 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 		{
 			PDEBUG("Error: Reading data from adc sensor");
 		}
-		read_data |= return_byte;	//reading 9th and th bit sent from SPI
+		read_data |= ((((unsigned int)return_byte) & 0xC0) >> 6);	//reading 9th and th bit sent from SPI
 
-		//copying from kernel space to user s
-		rc = copy_to_user(buf, &read_data, 2);	//2 bytes of data needs to be sent back to user
+		// Converting integer to string
+		sprintf(adc_buffchar, "%d\n", read_data);
+		buffchar_len = strlen(adc_buffchar);
+
+		//copying from kernel space to user space
+		rc = copy_to_user(buf, &adc_buffchar[0], buffchar_len);	//n=buffchar_len bytes of data needs to be sent back to user
 		if (rc)
 		{
 			PDEBUG("error: copy_to_user %ld", rc);
@@ -81,8 +86,8 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 		}
 		else
 		{
-			*f_pos = 2; // We transferred 1 bytes to user space
-			return 2; // 2 bytes transferred. rx_buff
+			*f_pos = buffchar_len; // We transferred 1 bytes to user space
+			return buffchar_len; // 2 bytes transferred. rx_buff
 		}		
 		
 	} 
