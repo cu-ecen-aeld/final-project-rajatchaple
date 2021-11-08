@@ -44,26 +44,27 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 {
 	
 	int read_data = 0;
+	int return_byte = 0;
 	unsigned long rc = 0;
 	uint8_t adc_buf = 0;
 	PDEBUG("Reading data from adc sensor");
 	adc_buf = 0x68;	//0110 1000 	0SCC MN98 where S is start bit, CC is channel select, M is for MSB First bit
 
 	//Invoking the low level TX/RX function
-	read_data = spi_rw(mcspi, &adc_buf);
-	if(read_data < 0)
+	return_byte = spi_rw(mcspi, &adc_buf);
+	if(return_byte < 0)
 	{
 		PDEBUG("Error Reading data from adc sensor");
 	}
-	read_data = read_data << 8;	//reading 9th and 8th bit sent from SPI
-
+	read_data = return_byte << 8
+	
 	adc_buf = 0;	//for receiving B7 to B0
-	read_data = spi_rw(mcspi, &adc_buf);	
-	if(read_data < 0)
+	return_byte = spi_rw(mcspi, &adc_buf);	
+	if(return_byte < 0)
 	{
 		PDEBUG("Error Reading data from adc sensor");
 	}
-	read_data |= read_data;	//reading 9th and th bit sent from SPI
+	read_data |= return_byte;	//reading 9th and th bit sent from SPI
 
 
 	if (*f_pos == 0) {
