@@ -1,3 +1,15 @@
+/********************************************************************************
+ * @file low_level_driver.c
+ * @brief Functions and data related to the adc_spi platform driver implementation
+ *
+ * @author Samuel Ortiz, Juha Yrjola
+ * https://android.googlesource.com/kernel/msm/+/android-6.0.1_r0.74/drivers/spi/spi-omap2-mcspi.c
+ * Modified by Rajat Chaple and Sundar Krishnakumar
+ * @copyright Copyright (c) 2019
+ *
+ ********************************************************************************/
+
+
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -110,7 +122,7 @@ int omap2_mcspi_setup_transfer(struct omap2_mcspi *mcspi)
 
     l &= ~OMAP2_MCSPI_CHCONF_CLKD_MASK; // Clear the bits before setting
 	// Set the clock divider
-	l |= (div << 2); // Close to 500KHz
+	l |= (div << 2); // Close to speed_hz
 
 	// CPOL is 0. So the lines will be high when idle.
 	// Set the PHA so that the data is latched on odd numbered edges
@@ -165,7 +177,7 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
 
 	// Force the Chipselect
 	// NOTE: EPOL=0. So 1 means CS=HIGH and 0 means CS=LOW
-	omap2_mcspi_force_cs(mcspi, 1);
+	omap2_mcspi_force_cs(mcspi, 0);
 
 	// Wait for TXS bit to be set
 	if (mcspi_wait_for_reg_bit(chstat_reg, OMAP2_MCSPI_CHSTAT_TXS) != 0)
@@ -194,7 +206,7 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
 
 	// Disable the cs force
 	// NOTE: EPOL=0. So 1 means CS=HIGH and 0 means CS=LOW
-	omap2_mcspi_force_cs(mcspi, 0);
+	omap2_mcspi_force_cs(mcspi, 1);
 
 	// Disable the channel
 	omap2_mcspi_set_enable(mcspi, 0);
