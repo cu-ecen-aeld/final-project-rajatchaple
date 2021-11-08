@@ -93,7 +93,7 @@ int omap2_mcspi_setup_transfer(struct omap2_mcspi *mcspi)
 	u32 l = 0, div = 0;
 
 	// Variable parameters - Should be set to match ADC chip's requirements
-    u32 speed_hz = 500000; // 500KHz
+    u32 speed_hz = 400000; // 400KHz
     u8 word_len = 8;
 
 	PDEBUG("\n###### In %s ######\n", __func__);
@@ -114,7 +114,7 @@ int omap2_mcspi_setup_transfer(struct omap2_mcspi *mcspi)
 	l |= (word_len - 1) << 7;
 
 	// Set the SPIEN state as high during active state
-	l &= ~(OMAP2_MCSPI_CHCONF_EPOL);
+	l |= (OMAP2_MCSPI_CHCONF_EPOL); /* active-low; normal */
 
 	mcspi_write_reg(mcspi, OMAP2_MCSPI_CHCONF0, l);
 
@@ -176,8 +176,8 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
 	omap2_mcspi_set_enable(mcspi, 1);
 
 	// Force the Chipselect
-	// NOTE: EPOL=0. So 1 means CS=HIGH and 0 means CS=LOW
-	omap2_mcspi_force_cs(mcspi, 0);
+	// NOTE: EPOL=1. So 1 means CS=LOW and 0 means CS=HIGH
+	omap2_mcspi_force_cs(mcspi, 1);
 
 	// Wait for TXS bit to be set
 	if (mcspi_wait_for_reg_bit(chstat_reg, OMAP2_MCSPI_CHSTAT_TXS) != 0)
@@ -205,8 +205,8 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
 
 
 	// Disable the cs force
-	// NOTE: EPOL=0. So 1 means CS=HIGH and 0 means CS=LOW
-	omap2_mcspi_force_cs(mcspi, 1);
+	// NOTE: EPOL=1. So 1 means CS=LOW and 0 means CS=HIGH
+	omap2_mcspi_force_cs(mcspi, 0);
 
 	// Disable the channel
 	omap2_mcspi_set_enable(mcspi, 0);
