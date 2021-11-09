@@ -147,7 +147,7 @@ static void omap2_mcspi_set_enable(struct omap2_mcspi *mcspi, int enable)
 
 
 
-int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
+int spi_rw(struct omap2_mcspi *mcspi, uint8_t *tx_buff, uint8_t tx_len, uint8_t *rx_buff, uint8_t rx_len)
 {
 	
 
@@ -155,16 +155,20 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
     void __iomem        *tx_reg;
     void __iomem        *rx_reg;
     void __iomem        *chstat_reg;
-    u8 rx;
-	u8 tx = *buff;
+    u8 *rx = NULL;
+	u8 *tx = NULL;
+	uint8_t idx = 0;
 
-	if (buff == NULL)
+	if (tx_buff == NULL || rx_buff == NULL)
 	{
-		PDEBUG("buff is NULL\n");
+		PDEBUG("tx_buff or rx_buff is NULL\n");
 		return -ENOMEM;
 	}
 
 	PDEBUG("\n###### In %s ######\n", __func__);
+
+    rx = rx_buff;
+	tx = tx_buff;	
 
     /* We store the pre-calculated register addresses on stack to speed
      * up the transfer loop. */
@@ -179,30 +183,39 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
 	// NOTE: EPOL=1. So 1 means CS=LOW and 0 means CS=HIGH
 	omap2_mcspi_force_cs(mcspi, 1);
 
-	// Wait for TXS bit to be set
-	if (mcspi_wait_for_reg_bit(chstat_reg, OMAP2_MCSPI_CHSTAT_TXS) != 0)
-	{
-		PDEBUG("Transmit timed out\n");
-		return -ETIMEDOUT;
+	while (idx < tx_len)
+	{	
+		// Wait for TXS bit to be set
+		if (mcspi_wait_for_reg_bit(chstat_reg, OMAP2_MCSPI_CHSTAT_TXS) != 0)
+		{
+			PDEBUG("Transmit timed out\n");
+			return -ETIMEDOUT;
+		}
+
+		// Do a dummy write to receive data.
+		// This dummy write is done to drive the clock.
+		// Write into the tx_reg with __raw_writel
+		__raw_writel(tx_buff[idx], tx_reg);	
+
+		if (idx < rx_len)
+		{
+
+			// Wait for RXS bit to be set
+			if (mcspi_wait_for_reg_bit(chstat_reg, OMAP2_MCSPI_CHSTAT_RXS) != 0)
+			{
+				PDEBUG("Receive timed out\n");
+				return -ETIMEDOUT;
+			}
+
+			// Read a bytes of data into the rx buffer
+			rx_buff[idx] = __raw_readl(rx_reg);
+			PDEBUG("\nrx[%u] = %x\n", idx, rx_buff[idx]);			
+
+		}
+
+		idx++;
+
 	}
-
-	// Do a dummy write to receive data.
-	// This dummy write is done to drive the clock.
-	// Write into the tx_reg with __raw_writel
-	__raw_writel(tx, tx_reg);	
-
-
-	// Wait for RXS bit to be set
-	if (mcspi_wait_for_reg_bit(chstat_reg, OMAP2_MCSPI_CHSTAT_RXS) != 0)
-	{
-		PDEBUG("Receive timed out\n");
-		return -ETIMEDOUT;
-	}
-
-	// Read a bytes of data into the rx buffer
-	rx = __raw_readl(rx_reg);
-	PDEBUG("\nrx = %x\n", rx);
-
 
 	// Disable the cs force
 	// NOTE: EPOL=1. So 1 means CS=LOW and 0 means CS=HIGH
@@ -211,7 +224,7 @@ int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff)
 	// Disable the channel
 	omap2_mcspi_set_enable(mcspi, 0);
 
-	return rx;
+	return 0; 
 }
 
 static void omap2_mcspi_set_master_mode(struct omap2_mcspi *mcspi)

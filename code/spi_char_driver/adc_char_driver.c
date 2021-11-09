@@ -44,33 +44,30 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 {
 	
 	unsigned int read_data = 0;
-	int return_byte = 0;
-	unsigned long rc = 0;
-	uint8_t adc_buf = 0;
+	int rc = 0;
+	uint8_t tx_buf[2] = {0x68, 0x00}; // 0x68 <-> 0b0110_1000 	0SCC MN98 where S is start bit, CC is channel select, M is for MSB First bit
+									  // 0x00 To receive D7-D0
+	uint8_t rx_buf[2] = {0};
 	char adc_buffchar[10] = {0};
 	uint8_t buffchar_len = 0;
 
 	PDEBUG("Reading data from adc sensor");
-	adc_buf = 0x68;	//0110 1000 	0SCC MN98 where S is start bit, CC is channel select, M is for MSB First bit
 
 
 	if (*f_pos == 0) {
 		
 		//Invoking the low level TX/RX function
-		return_byte = spi_rw(mcspi, &adc_buf);
-		if(return_byte < 0)
+		rc = spi_rw(mcspi, tx_buf, 2, rx_buf, 2);
+		if (rc)
 		{
-			PDEBUG("Error: Reading data from adc sensor");
+			PDEBUG("error: reading data from adc sensor %d", rc);
+			return rc; // Return the return code of spr_rw() call.
+			
 		}
-		read_data = ((return_byte & 0xFF) << 2);
 		
-		adc_buf = 0;	//for receiving B7 to B0
-		return_byte = spi_rw(mcspi, &adc_buf);	
-		if(return_byte < 0)
-		{
-			PDEBUG("Error: Reading data from adc sensor");
-		}
-		read_data |= ((((unsigned int)return_byte) & 0xC0) >> 6);	//reading 9th and th bit sent from SPI
+		// Combine values to get the digital adc value.
+		read_data = ((rx_buf[0] & 0x3U) << 8);
+		read_data |= (rx_buf[1] & 0xFFU);	//reading 9th and th bit sent from SPI
 
 		// Converting integer to string
 		sprintf(adc_buffchar, "%d\n", read_data);
@@ -80,7 +77,7 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 		rc = copy_to_user(buf, &adc_buffchar[0], buffchar_len);	//n=buffchar_len bytes of data needs to be sent back to user
 		if (rc)
 		{
-			PDEBUG("error: copy_to_user %ld", rc);
+			PDEBUG("error: copy_to_user %d", rc);
 			return -EFAULT;
 			
 		}

@@ -70,6 +70,6 @@ struct omap2_mcspi {
 
 int omap2_mcspi_setup_transfer(struct omap2_mcspi *mcspi);
 
-int spi_rw(struct omap2_mcspi *mcspi, uint8_t *buff);
+int spi_rw(struct omap2_mcspi *mcspi, uint8_t *tx_buff, uint8_t tx_len, uint8_t *rx_buff, uint8_t rx_len);
 
 #endif /* MCSPI_H */
