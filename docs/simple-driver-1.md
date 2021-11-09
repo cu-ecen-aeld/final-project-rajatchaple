@@ -17,12 +17,12 @@ Link: https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/s
 
 ## Code organization
 
-![simple-driver-1](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/simple-driver-1.jpg)
+![simple-driver-1](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/simple-driver.jpg)
 
-The 'Simple driver Part 1' model shown above has these two major problems - 
+The 'Simple driver' model shown above has these two major problems - 
 
  - The BeagleBoneBlack's mcSPI register addresses and the SPI pin configurations are part of the Master driver. This make the Master driver's code hardly re-usable across other SPI hardware modules or other channels of the same SPI hardware module. 
  
- **Solution**: The mcSPI register addresses and SPI pin configurations can be moved to a special file called Device Tree (DT). The DT contains data structures which the linux kernel developer uses to describe all the required peripherals of the board. This will be implemented in the next stage of the driver design 'Simple driver Part 2'.
+ **Solution**: The mcSPI register addresses and SPI pin configurations can be moved to a special file called Device Tree (DT). The DT contains data structures which the linux kernel developer uses to describe all the required peripherals of the board. This will be implemented in the next stage of the driver design 'Advanced driver Part-1'.
 
-  - The character driver and low level driver are tightly coupled. Any change on one code will affect the other. This would be dealt in the next phase.
+  - The character driver and low level driver are tightly coupled. Any change on one code will affect the other. This problem and its solution would be dealt in the upcoming phase of the driver design 'Advanced driver Part-2'.
