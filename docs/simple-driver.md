@@ -4,7 +4,9 @@ The client driver can also be called as character driver.
 
 File name: adc_char_driver.c
 
-Link: https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/spi_char_driver/adc_char_driver.c
+Absolute Path: final-project-rajatchaple/code/spi_char_driver/
+
+Branch: simple-driver
 
 
 ## Master driver
@@ -13,11 +15,13 @@ The master driver can be also called as the low-level driver/platform driver.
 
 File name: low_level_driver.c
 
-Link: https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/spi_char_driver/low_level_driver.c
+Absolute Path: final-project-rajatchaple/code/spi_char_driver/
+
+Branch: simple-driver
 
 ## Code organization
 
-![simple-driver-1](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/simple-driver.jpg)
+![simple-driver](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/simple-driver/images/simple-driver.jpg)
 
 The 'Simple driver' model shown above has these two major problems - 
 
