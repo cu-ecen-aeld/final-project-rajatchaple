@@ -21,7 +21,7 @@ Branch: simple-driver
 
 ## Code organization
 
-![simple-driver](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/simple-driver/images/simple-driver.jpg)
+![simple-driver](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/simple-driver.jpg)
 
 The 'Simple driver' model shown above has these two major problems - 
 
