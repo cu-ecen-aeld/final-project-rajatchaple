@@ -4,9 +4,7 @@ The client driver can also be called as character driver.
 
 File name: adc_char_driver.c
 
-Absolute Path: final-project-rajatchaple/code/spi_char_driver/
-
-Branch: simple-driver
+https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/simple-driver/adc_char_driver.c
 
 
 ## Master driver
@@ -15,9 +13,8 @@ The master driver can be also called as the low-level driver/platform driver.
 
 File name: low_level_driver.c
 
-Absolute Path: final-project-rajatchaple/code/spi_char_driver/
+https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/simple-driver/low_level_driver.c
 
-Branch: simple-driver
 
 ## Code organization
 
