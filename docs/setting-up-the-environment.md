@@ -1,9 +1,12 @@
 ## Setting up buildroot environment for BBB
 
-Follow AESD Assignment 4 instructions for setting up buildroot environemnt and adding dropbear package for SSH support.
+Follow AESD Assignment 4 instructions for setting up buildroot environmnt and adding dropbear package for SSH support.
+
+Buildroot source: https://git.busybox.net/buildroot/ (Branch: 2021.02.x)
+
+Linux kernel version: 4.19.79
 
 NOTE: In shared.sh file specify the correct defconfig file for the target hardware - BeagleBoneBlack.
-
 
 ## Setting SPI hardware module on BBB
 
