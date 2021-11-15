@@ -29,15 +29,16 @@ NOTE: The compatible property, in case of multiple strings, each of them are sep
 
 ![adv-driver-1](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/adv-driver-1.jpg)
 
- - The problem of code re-usablity has been solved using Device Tree (DT) and platform bus integration.
- - The Problem of tight coupling between char driver and low level driver has been solved by integrating Linux SPI framework into the design.
+ - The problem of code re-usablity has been solved using Device Tree (DT) and platform bus integration. By moving the hardware register addresses and gpio pin configuration information to the DT, now we have a more generic code that is re-usable across other SPI hardware controllers.
+
+ - The Problem of tight coupling between char driver and low level driver has been solved by integrating Linux SPI framework into the design. The SPI framework acts as a middle-ware and mediates the communication between both the drivers. As a result, now both the drivers are independent of each other; the drivers have to register themselves with the framework in order to use the framework's APIs.
 
 ## Probing
 
 
 ![probing_in_action](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/arch.JPG)
 
-
+The image shows how probing happens in kernel drivers. When there a match between the comaptible strings in the DT and the driver code, the binding is successful and the associated probe() function gets invoked.
 
 
 ## References
