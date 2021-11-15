@@ -25,6 +25,23 @@ Child node entry for the MCP3002 ADC IC: spi_mcp3002@0 | Name property: "adc3002
 
 NOTE: The compatible property, in case of multiple strings, each of them are separated by double quotes. The name property, in case of mutiple strings, each of them are separated by commas.
 
+## Client driver
+
+The client driver can also be called as character driver.
+
+File name: adc_char_driver.c
+
+https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/adv-driver-1/adc_char_driver.c
+
+
+## Master driver
+
+The master driver can be also called as the low-level driver/platform driver.
+
+File name: low_level_driver.c
+
+https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/adv-driver-1/low_level_driver.c
+
 ## Code organization
 
 ![adv-driver-1](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/adv-driver-1.jpg)
