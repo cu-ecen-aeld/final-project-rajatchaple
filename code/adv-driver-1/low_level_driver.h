@@ -68,8 +68,16 @@ struct omap2_mcspi {
     struct cdev cdev;
 };
 
-int omap2_mcspi_setup_transfer(struct omap2_mcspi *mcspi);
+struct omap2_mcspi_dma {
+	struct dma_chan *dma_tx;
+	struct dma_chan *dma_rx;
 
-int spi_rw(struct omap2_mcspi *mcspi, uint8_t *tx_buff, uint8_t tx_len, uint8_t *rx_buff, uint8_t rx_len);
+	struct completion dma_tx_completion;
+	struct completion dma_rx_completion;
+
+	char dma_rx_ch_name[14];
+	char dma_tx_ch_name[14];
+};
+
 
 #endif /* MCSPI_H */

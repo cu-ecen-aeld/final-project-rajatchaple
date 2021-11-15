@@ -26,7 +26,7 @@ MODULE_AUTHOR("Rajat Chaple");
 MODULE_LICENSE("Dual BSD/GPL");
 
 
-static struct omap2_mcspi *mcspi;
+
 
 /***********************************************************************************
  * adc char driver function for (userspace) open call
@@ -34,7 +34,17 @@ static struct omap2_mcspi *mcspi;
 static int my_adc_open(struct inode *i, struct file *f)
 {
 	PDEBUG("adc_spi open");
-	return omap2_mcspi_setup_transfer(mcspi);
+
+	struct omap2_mcspi *mcspi = container_of(i->i_cdev, struct omap2_mcspi, cdev);
+
+	if (omap2_mcspi == NULL) {
+		printk("Data is null\n");
+		return -1;
+	}
+
+	f->private_data = omap2_mcspi;
+
+	return 0;
 }
 
 /***********************************************************************************
@@ -104,9 +114,9 @@ static struct file_operations driver_fops =
 };
 
 /***********************************************************************************
- * This function initializes char driver
+ * 
  * *********************************************************************************/
-int chrdev_init(struct omap2_mcspi *lmcspi)
+static int my_spi_probe(struct spi_device *spi)
 {
 	int ret = 0;
 	struct device *dev_ret = NULL;
@@ -155,9 +165,12 @@ int chrdev_init(struct omap2_mcspi *lmcspi)
 /***********************************************************************************
  * This function is called at exit
  * *********************************************************************************/
-void chrdev_exit(void)
+static int my_spi_remove(struct spi_device *spi)
 {
-	//Deleting the device file & the class --done
+
+	struct omap2_mcspi *mcspi = spi_get_drvdata(spi)
+
+	// Deleting the device file & the class
 	device_destroy(mcspi->spi_class, mcspi->devt);
 	class_destroy(mcspi->spi_class);
 
@@ -166,6 +179,32 @@ void chrdev_exit(void)
 
     //Unregistering character driver --done
 	unregister_chrdev_region(mcspi->devt, MINOR_CNT);
-	PDEBUG("exiting adc spi module");
+
+	PDEBUG("Exiting adc spi module");
+	
 }
+
+
+// Populate the id table as per dtb
+static const struct spi_device_id my_spi_client_id[] = {
+	{ "my_spi_client", 0 },
+	{ }
+};
+
+MODULE_DEVICE_TABLE(spi, my_spi_client_id);
+
+// Populate the spi_driver data structure
+static struct spi_driver my_spi_client_driver = {
+
+	.driver = {
+
+		.name = "omap_spi_client",
+		.owner = THIS_MODULE
+	},
+	.probe = my_spi_probe,
+	.remove = my_spi_remove,
+	.id_table = my_spi_client_id
+};
+
+module_spi_driver(my_spi_client_driver);  
 

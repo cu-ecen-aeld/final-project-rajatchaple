@@ -21,8 +21,6 @@
 #include "adc_char_driver.h"
 #include "low_level_driver.h"
 
-struct omap2_mcspi mcspi;
-
 static inline void mcspi_write_reg(struct omap2_mcspi *mcspi,
         int idx, u32 val)
 {
@@ -241,15 +239,41 @@ static void omap2_mcspi_set_master_mode(struct omap2_mcspi *mcspi)
 	l |= (OMAP2_MCSPI_MODULCTRL_SINGLE);
 
 	// Write the l back to OMAP2_MCSPI_MODULCTRL register
-	mcspi_write_reg(mcspi, OMAP2_MCSPI_MODULCTRL, l);
-        
+	mcspi_write_reg(mcspi, OMAP2_MCSPI_MODULCTRL, l);        
 
 }
 
-static int __init omap_spi_init_driver(void)
-{
-	void __iomem    *spi_pad_base;
+static int mcspi_probe(struct platform_device *pdev)	
+{	
+
+	PDEBUG("\n###### In %s ######\n", __func__);
+
+    struct omap2_mcspi *mcspi;
+    struct resource *r = NULL;
+	
+	// Allocate the memory for omap2_mcspi and assign it to mcspi
+	// GFP_KERNEL to allocate in kernel region
+    mcspi = kzalloc(sizeof(struct omap2_mcspi), GFP_KERNEL); 
+	
+    // Context saving mechanism as this code is shared between many spi controllers.
+	// platform_set_drvdata() call is useful if we need to retrieve back 
+	// the private information.
+	platform_set_drvdata(pdev, mcspi); 
+
+
+	// Get the base address from platform device
+    // Get IORESOURCE_MEM from the pdec supplied in this probe callback function.
+    // 0 - Interrupt number, If there is 2nd controller, then number it as 1.
+    r = platform_get_resource(pdev, IORESOURCE_MEM, 0); 
+
+    if (r == NULL) {
+
+        return -ENODEV;
+    }
+
 	/*
+     * Get the virtual address for the spi0 base address and store it
+     * in 'base' field of mcspi. Add the offset of 0x100 to base address in trm (See TRM).
 	 * 
 	 * NOTE: ioremap() - 
 	 * 1. Uses the page tables for virtual and phy address mapping.
@@ -257,41 +281,77 @@ static int __init omap_spi_init_driver(void)
 	 * 2. Does not caches.
 	 * 
     */
-    mcspi.base = ioremap(0x48030100, 0x1000);   
+    mcspi->base = ioremap(r->start, resource_size(r)); 
 
-    if (IS_ERR(mcspi.base)) {   
-        PDEBUG(KERN_ERR "Unable to ioremap\n");
-        return PTR_ERR(mcspi.base);
+    if (IS_ERR(mcspi->base)) {
+        printk(KERN_ERR "Unable to ioremap\n");
+        return PTR_ERR(mcspi->base);
     }
 
-	/* Set up the pin mux for the spi0 pins */
-	spi_pad_base = ioremap(0x44E10950, 0x10);
-    if (IS_ERR(spi_pad_base)) {
-        PDEBUG(KERN_ERR "Unable to ioremap\n");
-        return PTR_ERR(spi_pad_base);
-    }
-	__raw_writel(0x30, spi_pad_base);
-	__raw_writel(0x30, spi_pad_base + 0x4);
-	__raw_writel(0x10, spi_pad_base + 0x8);
-	__raw_writel(0x10, spi_pad_base + 0xc);
+	mcspi->base += 0x100; // Add 0x100 offset to the base address.
+	mcspi->dev = &pdev->dev;
 
-	omap2_mcspi_set_master_mode(&mcspi);
-
-    // Initialize the character driver interface
-    chrdev_init(&mcspi);
+	omap2_mcspi_set_master_mode(mcspi);
 
     return 0;
+
+}
+
+
+static int mcspi_remove(struct platform_device *pdev)	
+{	
+
+	PDEBUG("\n###### In %s ######\n", __func__);
+
+	struct omap2_mcspi *mcspi;
+
+	mcspi = platform_get_drvdata(pdev);
+
+	// Free up the mcspi data structure
+    kfree(mcspi);
+    
+	return 0;
+
+}
+
+		
+// Populate the id table with compatible property as per dtb	
+static const struct of_device_id mcspi_of_match[] = {	
+	{ .compatible = "ti-omap,spi0" },	
+    { },	
+};
+
+MODULE_DEVICE_TABLE(of, mcspi_of_match);	
+
+// Populate the platform driver structure	
+static struct platform_driver mcspi_driver = {	
+    .driver = {	
+        .name = "omap,spi0", // Any name. Was used before dtb was developed in linux	
+        .owner = THIS_MODULE,	
+        .of_match_table = mcspi_of_match // Contains the compatible 'match' string	
+                                                      	
+    },	
+    .probe = mcspi_probe, // registering the probe callback	
+    .remove = mcspi_remove	
+}
+
+static int __init omap_spi_init_driver(void)
+{
+
+	// Register the platform driver
+	return platform_driver_register(&mcspi_driver);	
+
 }
 
 static void __exit omap_spi_exit_driver(void)
 {
-    // De-initialize the character driver interface
-    chrdev_exit();
+	// De-register the platform driver
+	platform_driver_unregister(&mcspi_driver);
 }
 
 module_init(omap_spi_init_driver);
 module_exit(omap_spi_exit_driver);
 
-MODULE_AUTHOR("sundar");
+MODULE_AUTHOR("Sundar Krishnakumar");
 MODULE_DESCRIPTION("Low level SPI driver");
 MODULE_LICENSE("GPL");
