@@ -62,9 +62,15 @@ The image shows how probing happens in kernel drivers. When there a match betwee
 
 
 ## References
- - Linux Device Drivers Development (Book) by John Madieu.
 
- - https://lwn.net/Articles/448499/
+ * Platform bus, Platform driver:
+   * https://lwn.net/Articles/448499/
+   * Linux Device Drivers Development (Book) by John Madieu.
+  
+ * Device Tree:
+   * https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable/+/refs/tags/v4.19.79/Documentation/devicetree/bindings/spi/omap-spi.txt
 
- - How to create a patch? 
+   *  https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable/+/refs/tags/v4.19.79/Documentation/devicetree/bindings/iio/adc/mcp320x.txt
+
+ * How to create a patch? 
     Book:  BeagleBone Cookbook (Page 492)
