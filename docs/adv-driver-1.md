@@ -15,7 +15,13 @@ The platform device information can be fed to the kernel in multiple ways. The l
 
 ## Device Tree
 
-@@ patch @@
+Patch Link: @@ patch @@
+
+Follow steps 3 and 4 at [link](https://github.com/cu-ecen-aeld/buildroot-assignments-base/wiki/Beagle-Bone-Black-Devicetree-Hardware-Support) to add the patch successfuly.
+
+Parent node entry for the BBB SPI0 hardware module: spi@48030000 | Label: aesd_spi0 | Comaptible string: "ti-omap,spi0"
+
+Child node entry for the MCP3002 ADC IC: spi_mcp3002@0 | Compatible string: "adc3002"
 
 ## Code organization
 
@@ -23,7 +29,15 @@ The platform device information can be fed to the kernel in multiple ways. The l
 
 @@ problem - solution @@
 
+## Probing
+
+@@ image @@
+
+
 ## References
  - Linux Device Drivers Development (Book) by John Madieu.
 
  - https://lwn.net/Articles/448499/
+
+ - How to create a patch? 
+    Book:  BeagleBone Cookbook (Page 492)
