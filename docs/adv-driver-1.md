@@ -23,6 +23,8 @@ Parent node entry for the BBB SPI0 hardware module: spi@48030000 | Label: aesd_s
 
 Child node entry for the MCP3002 ADC IC: spi_mcp3002@0 | Name property: "adc3002"
 
+NOTE: The compatible property, in case of multiple strings, each of them are separated by double quotes. The name property, in case of mutiple strings, each of them are separated by commas.
+
 ## Code organization
 
 @@ image @@
