@@ -29,11 +29,15 @@ NOTE: The compatible property, in case of multiple strings, each of them are sep
 
 ![adv-driver-1](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/adv-driver-1.jpg)
 
-@@ problem - solution @@
+ - The problem of code re-usablity has been solved using Device Tree (DT) and platform bus integration.
+ - The Problem of tight coupling between char driver and low level driver has been solved by integrating Linux SPI framework into the design.
 
 ## Probing
 
-@@ image @@
+
+![probing_in_action](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/arch.JPG)
+
+
 
 
 ## References
