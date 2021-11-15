@@ -9,8 +9,6 @@
 #include <linux/kernel.h> // for sprintf()
 #include <linux/string.h>
 
-#include "low_level_driver.h"
-
 #define ADC_DEBUG 1 //Remove comment on this line to enable debug
 
 #undef PDEBUG /* undef it, just in case */
@@ -25,8 +23,5 @@
 #else
 #define PDEBUG(fmt, args...) /* not debugging: nothing */
 #endif
-
-int chrdev_init(struct omap2_mcspi *lmcspi);
-void chrdev_exit(void);
 
 #endif  //ADC_SPI_CHAR_H

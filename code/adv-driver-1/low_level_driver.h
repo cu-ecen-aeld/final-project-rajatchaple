@@ -1,5 +1,5 @@
-#ifndef MCSPI_H
-#define MCSPI_H
+#ifndef LOW_LEVEL_DRIVER_H
+#define LOW_LEVEL_DRIVER_H
 
 #define OMAP2_MCSPI_MAX_FREQ        48000000
 #define OMAP2_MCSPI_MAX_FIFODEPTH   64
@@ -58,26 +58,27 @@
 
 #define OMAP2_MCSPI_WAKEUPENABLE_WKEN   BIT(0)
 
+#define ADC_DEBUG 1 //Remove comment on this line to enable debug
+
+#undef PDEBUG /* undef it, just in case */
+#ifdef ADC_DEBUG
+#ifdef __KERNEL__
+/* This one if debugging is on, and kernel space */
+#define PDEBUG(fmt, args...) printk(KERN_DEBUG "adc_spi: " fmt, ##args)
+#else
+/* This one for user space */
+#define PDEBUG(fmt, args...) fprintf(stderr, fmt, ##args)
+#endif
+#else
+#define PDEBUG(fmt, args...) /* not debugging: nothing */
+#endif
 
 struct omap2_mcspi {
+	struct spi_master *master;
 	/* Virtual base address of the controller */
-	void __iomem *base;
-    /* for providing a character device access */
-    struct class *spi_class;
-    dev_t devt;
-    struct cdev cdev;
-};
-
-struct omap2_mcspi_dma {
-	struct dma_chan *dma_tx;
-	struct dma_chan *dma_rx;
-
-	struct completion dma_tx_completion;
-	struct completion dma_rx_completion;
-
-	char dma_rx_ch_name[14];
-	char dma_tx_ch_name[14];
+	void __iomem	*base;
+	struct device   *dev;
 };
 
 
-#endif /* MCSPI_H */
+#endif /* LOW_LEVEL_DRIVER_H */

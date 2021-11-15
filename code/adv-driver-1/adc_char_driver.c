@@ -4,45 +4,53 @@
  *
  * @author Andrea Paterniani
  * https://github.com/torvalds/linux/blob/master/drivers/spi/spidev.c
- * Modified by Rajat Chaple and Sundar Krishnakumar
- * @date 2021-11-05
+ * Modified by Rajat Chaple
+ * @date 2021-14-05
  * @copyright Copyright (c) 2019
  *
  ********************************************************************************/
-
 #include <linux/module.h>
-#include <linux/init.h>
-#include <linux/printk.h>
-#include <linux/types.h>
+#include <linux/fs.h>
 #include <linux/cdev.h>
-#include <linux/fs.h> // file_operations
-#include <linux/uaccess.h>
-
+#include <linux/device.h>
+#include <linux/errno.h>
+#include <asm/uaccess.h>
+#include <linux/platform_data/serial-omap.h>
 #include "adc_char_driver.h"
+
 #define FIRST_MINOR 0
 #define MINOR_CNT 1
 
 MODULE_AUTHOR("Rajat Chaple");
 MODULE_LICENSE("Dual BSD/GPL");
+MODULE_LICENSE("GPL v2");
 
-
-
+struct spi_data {
+	struct spi_device *spi;
+	struct spi_message msg;
+	struct spi_transfer transfer[1];
+	u8 tx_buf[2];
+	u8 rx_buf[2];
+	struct mutex lock;
+	/* Character Driver Files */
+	dev_t devt;
+	struct cdev cdev;
+	struct class *class;
+};
 
 /***********************************************************************************
  * adc char driver function for (userspace) open call
  * *********************************************************************************/
 static int my_adc_open(struct inode *i, struct file *f)
 {
-	PDEBUG("adc_spi open");
-
-	struct omap2_mcspi *mcspi = container_of(i->i_cdev, struct omap2_mcspi, cdev);
-
-	if (omap2_mcspi == NULL) {
-		printk("Data is null\n");
+	
+	struct spi_data *dev = container_of(i->i_cdev, struct spi_data, cdev);
+	if (dev == NULL) {
+		PDEBUG("Data is null\n");
 		return -1;
 	}
 
-	f->private_data = omap2_mcspi;
+	f->private_data = dev;
 
 	return 0;
 }
@@ -52,58 +60,63 @@ static int my_adc_open(struct inode *i, struct file *f)
  * *********************************************************************************/
 static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t *f_pos)
 {
-	
-	unsigned int read_data = 0;
-	int rc = 0;
-	uint8_t tx_buf[2] = {0x68, 0x00}; // 0x68 <-> 0b0110_1000 	0SCC MN98 where S is start bit, CC is channel select, M is for MSB First bit
-									  // 0x00 To receive D7-D0
-	uint8_t rx_buf[2] = {0};
+
+	struct spi_data *dev = (struct spi_data *)(f->private_data);
+	int ret = -1;
 	char adc_buffchar[10] = {0};
 	uint8_t buffchar_len = 0;
+	unsigned int read_data = 0;
+	int err = 0;
 
-	PDEBUG("Reading data from adc sensor");
-
+	mutex_lock(&dev->lock);
 
 	if (*f_pos == 0) {
 		
-		//Invoking the low level TX/RX function
-		rc = spi_rw(mcspi, tx_buf, 2, rx_buf, 2);
-		if (rc)
+		dev->tx_buf[0] = 0x68;
+		dev->tx_buf[1] = 0x00;
+		PDEBUG("tx = 0x%x 0x%x\t", dev->tx_buf[0], dev->tx_buf[1]);
+
+		//Initiating the spi transaction
+		ret = spi_sync(dev->spi, &dev->msg);
+
+		if (ret < 0)
 		{
-			PDEBUG("error: reading data from adc sensor %d", rc);
-			return rc; // Return the return code of spr_rw() call.
-			
+			err = ret;
+			goto my_read_return;
 		}
-		
+
 		// Combine values to get the digital adc value.
-		read_data = ((rx_buf[0] & 0x3U) << 8);
-		read_data |= (rx_buf[1] & 0xFFU);	//reading 9th and th bit sent from SPI
+		read_data = ((dev->rx_buf[0] & 0x3U) << 8);
+		read_data |= (dev->rx_buf[1] & 0xFFU);	//reading 9th and th bit sent from SPI
 
 		// Converting integer to string
 		sprintf(adc_buffchar, "%d\n", read_data);
 		buffchar_len = strlen(adc_buffchar);
 
-		//copying from kernel space to user space
-		rc = copy_to_user(buf, &adc_buffchar[0], buffchar_len);	//n=buffchar_len bytes of data needs to be sent back to user
-		if (rc)
+		//Exchanging the rx_buf data with user space 
+		if (copy_to_user(buf, adc_buffchar, buffchar_len))
 		{
-			PDEBUG("error: copy_to_user %d", rc);
-			return -EFAULT;
-			
+			PDEBUG("User space copy failed\n");
+			err =  -EFAULT;
+			goto my_read_return;
 		}
-		else
-		{
-			*f_pos = buffchar_len; // We transferred 1 bytes to user space
-			return buffchar_len; // 2 bytes transferred. rx_buff
-		}		
-		
+
+		*f_pos = buffchar_len; // We transferred n=buffchar_len bytes to user space
+		mutex_unlock(&dev->lock);
+		return buffchar_len; 
 	} 
 	else {
+
 		*f_pos = 0;
-		return 0;
+		err = 0;
+		goto my_read_return;
+
 	}
 
-	return 0;
+my_read_return:
+	mutex_unlock(&dev->lock);
+	return err;
+
 }
 
 static struct file_operations driver_fops =
@@ -114,86 +127,111 @@ static struct file_operations driver_fops =
 };
 
 /***********************************************************************************
- * 
+ * This function initializes char driver
  * *********************************************************************************/
-static int my_spi_probe(struct spi_device *spi)
+static int my_adc_probe(struct spi_device *spi)
 {
-	int ret = 0;
+	struct spi_data *data;
+	int init_result;
 	struct device *dev_ret = NULL;
-	mcspi = lmcspi;
 
-	// Dynamic allocation method. dev_t is populated by 
-    // alloc_chrdev_region()
-	if ((ret = alloc_chrdev_region(&mcspi->devt, FIRST_MINOR, MINOR_CNT, "spi_driver")) < 0)
+	PDEBUG("\nInside spi client probe function\n");
+
+	// devm_kzalloc() is resource-managed kzalloc() 
+	// If we use devm_kzalloc() then no need to free this memory
+	data = devm_kzalloc(&spi->dev, sizeof(struct spi_data), GFP_KERNEL);
+	data->spi = spi;
+
+	//Assigning the tx_buf and rx_buf of dummy_data to corresponding fields of transfer DS
+	data->transfer[0].tx_buf = &data->tx_buf;
+	data->transfer[0].rx_buf = &data->rx_buf;
+	data->transfer[0].len = sizeof(data->tx_buf);
+
+	//Initializing the data->msg with transfer structures
+	spi_message_init_with_transfers(&data->msg, 
+									data->transfer, 
+									ARRAY_SIZE(data->transfer));
+
+	spi_set_drvdata(spi, data);
+
+	init_result = alloc_chrdev_region(&data->devt, 0, 1, "spi_client");
+
+	if (0 > init_result)
 	{
-		PDEBUG("Error: Can't get major");
-		return ret;
+		PDEBUG("Device Registration failed\n");
+		unregister_chrdev_region(data->devt, 1);
+		return -1;
+	}
+	PDEBUG("Major Nr: %d\n", MAJOR(data->devt));
+
+	if ((data->class = class_create(THIS_MODULE, "spiclient")) == NULL)
+	{
+		PDEBUG("Class creation failed\n" );
+		unregister_chrdev_region(data->devt, 1);
+		return -1;
+	}
+	//Createing the device file
+	dev_ret = device_create(data->class, NULL, data->devt, NULL, "spi%d", 0);
+
+	if (dev_ret == NULL)
+	{
+		PDEBUG("Device creation failed\n" );
+		class_destroy(data->class);
+		unregister_chrdev_region(data->devt, 1);
+		return -1;
+	}
+	
+	cdev_init(&data->cdev, &driver_fops);
+
+	//Registering the file ops
+	// last argument=1 The number of consecutive minor numbers.
+	init_result = cdev_add(&data->cdev, data->devt, 1);
+
+
+	if (init_result == -1)
+	{
+		PDEBUG("Device addition failed\n" );
+		device_destroy(data->class, data->devt);
+		class_destroy(data->class);
+		unregister_chrdev_region(data->devt, 1 );
+		return -1;
 	}
 
- 	cdev_init(&mcspi->cdev, &driver_fops);
-	mcspi->cdev.owner = THIS_MODULE;
-	ret = cdev_add(&mcspi->cdev, mcspi->devt, MINOR_CNT);	
-
-	if (ret < 0)
-	{
-		unregister_chrdev_region(mcspi->devt, MINOR_CNT);
-		return ret;
-	}
-
-	if (IS_ERR(lmcspi->spi_class = class_create(THIS_MODULE, "spi")))
-	{
-		cdev_del(&mcspi->cdev);
-		unregister_chrdev_region(mcspi->devt, MINOR_CNT);
-		return PTR_ERR(lmcspi->spi_class);
-	}
-
-	dev_ret = device_create(lmcspi->spi_class, NULL, mcspi->devt, NULL, "spi%d", FIRST_MINOR);
-
-	if (IS_ERR(dev_ret))
-	{
-		class_destroy(mcspi->spi_class);
-		cdev_del(&mcspi->cdev);
-		unregister_chrdev_region(mcspi->devt, MINOR_CNT);
-		return PTR_ERR(dev_ret);
-	}
-
-	PDEBUG("ADC SPI driver module initialized");
-
+	mutex_init(&data->lock);
+	
 	return 0;
 }
 
 /***********************************************************************************
  * This function is called at exit
  * *********************************************************************************/
-static int my_spi_remove(struct spi_device *spi)
+static int my_adc_remove(struct spi_device *spi)
 {
+	struct spi_data *data = spi_get_drvdata(spi);
+	// Deleting the device file & the class 
+	device_destroy(data->class, data->devt);
+	class_destroy(data->class);
 
-	struct omap2_mcspi *mcspi = spi_get_drvdata(spi)
+    // Unregistering file operations 
+	cdev_del(&data->cdev);
 
-	// Deleting the device file & the class
-	device_destroy(mcspi->spi_class, mcspi->devt);
-	class_destroy(mcspi->spi_class);
+    // Unregistering character driver 
+	unregister_chrdev_region(data->devt, 1);
 
-    // Unregistering file operations --done
-	cdev_del(&mcspi->cdev);
+	PDEBUG("\nMy spi probe remove function\n");
 
-    //Unregistering character driver --done
-	unregister_chrdev_region(mcspi->devt, MINOR_CNT);
-
-	PDEBUG("Exiting adc spi module");
-	
+	return 0;
 }
 
-
-// Populate the id table as per dtb
+//Populating the id table as per dtb
 static const struct spi_device_id my_spi_client_id[] = {
-	{ "my_spi_client", 0 },
+	{ "adc3002", 0 },
 	{ }
 };
 
 MODULE_DEVICE_TABLE(spi, my_spi_client_id);
 
-// Populate the spi_driver data structure
+//Populating the spi_driver data structure
 static struct spi_driver my_spi_client_driver = {
 
 	.driver = {
@@ -201,10 +239,10 @@ static struct spi_driver my_spi_client_driver = {
 		.name = "omap_spi_client",
 		.owner = THIS_MODULE
 	},
-	.probe = my_spi_probe,
-	.remove = my_spi_remove,
+	.probe = my_adc_probe,
+	.remove = my_adc_remove,
 	.id_table = my_spi_client_id
 };
 
-module_spi_driver(my_spi_client_driver);  
+module_spi_driver(my_spi_client_driver); // reg. with framework. 
 
