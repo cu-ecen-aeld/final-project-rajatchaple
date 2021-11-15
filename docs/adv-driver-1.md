@@ -25,6 +25,9 @@ Child node entry for the MCP3002 ADC IC: spi_mcp3002@0 | Name property: "adc3002
 
 NOTE: The compatible property, in case of multiple strings, each of them are separated by double quotes. The name property, in case of mutiple strings, each of them are separated by commas.
 
+Writing the pin configuration node "spi0_pins" - The configuration details for the pins SCLK, MOSI, MISO, CHIP_SELECT are given to the pinctrl subsystem.
+Microprocessor allow users to re-use the same gpio pins for different alternate functionalities. This is possible through a technique called pin-muxing. The Pin control (pinctrl ) subsystem allows managing pin muxing. The programmer should make a DT node entry and the pinctrl subsystem takes care of configuring those gpio pins for the intended alternate use. In our case, we want the pins to behave as SPI pins.
+
 ## Client driver
 
 The client driver can also be called as character driver.
