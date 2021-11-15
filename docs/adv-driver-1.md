@@ -15,7 +15,7 @@ The platform device information can be fed to the kernel in multiple ways. The l
 
 ## Device Tree
 
-Patch Link: @@ patch @@
+Patch Link: https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blob/master/base_external/patches/linux/devtree.patch
 
 Follow steps 3 and 4 at [link](https://github.com/cu-ecen-aeld/buildroot-assignments-base/wiki/Beagle-Bone-Black-Devicetree-Hardware-Support) to add the patch successfuly.
 
