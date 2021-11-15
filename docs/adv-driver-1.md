@@ -19,9 +19,9 @@ Patch Link: https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blo
 
 Follow steps 3 and 4 at [link](https://github.com/cu-ecen-aeld/buildroot-assignments-base/wiki/Beagle-Bone-Black-Devicetree-Hardware-Support) to add the patch successfuly.
 
-Parent node entry for the BBB SPI0 hardware module: spi@48030000 | Label: aesd_spi0 | Comaptible string: "ti-omap,spi0"
+Parent node entry for the BBB SPI0 hardware module: spi@48030000 | Label: aesd_spi0 | Comaptible property: "ti-omap,spi0"
 
-Child node entry for the MCP3002 ADC IC: spi_mcp3002@0 | Compatible string: "adc3002"
+Child node entry for the MCP3002 ADC IC: spi_mcp3002@0 | Name property: "adc3002"
 
 ## Code organization
 
