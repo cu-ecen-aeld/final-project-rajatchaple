@@ -27,7 +27,7 @@ NOTE: The compatible property, in case of multiple strings, each of them are sep
 
 ## Code organization
 
-@@ image @@
+![adv-driver-1](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/adv-driver-1.jpg)
 
 @@ problem - solution @@
 
