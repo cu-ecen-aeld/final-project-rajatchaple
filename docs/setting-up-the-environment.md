@@ -14,7 +14,7 @@ Follow steps 3 and 4 at [link](https://github.com/cu-ecen-aeld/buildroot-assignm
 ## Reference
 
  - How to create a patch? 
-    Book:  BeagleBone Cookbook (492)
+    Book:  BeagleBone Cookbook (Page 492)
 
 
 
