@@ -72,5 +72,4 @@ The image shows how probing happens in kernel drivers. When there a match betwee
 
    *  https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable/+/refs/tags/v4.19.79/Documentation/devicetree/bindings/iio/adc/mcp320x.txt
 
- * How to create a patch? 
-    Book:  BeagleBone Cookbook (Page 492)
+
