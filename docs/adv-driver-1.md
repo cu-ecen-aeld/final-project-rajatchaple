@@ -26,7 +26,7 @@ Child node entry for the MCP3002 ADC IC: spi_mcp3002@0 | Name property: "adc3002
 NOTE: The compatible property, in case of multiple strings, each of them are separated by double quotes. The name property, in case of mutiple strings, each of them are separated by commas.
 
 Writing the pin configuration node "spi0_pins" - The configuration details for the pins SCLK, MOSI, MISO, CHIP_SELECT are given to the pinctrl subsystem.
-Microprocessor allow users to re-use the same gpio pins for different alternate functionalities. This is possible through a technique called pin-muxing. The Pin control (pinctrl ) subsystem allows managing pin muxing. The programmer should make a DT node entry and the pinctrl subsystem takes care of configuring those gpio pins for the intended alternate use. In our case, we want the pins to behave as SPI pins.
+Microprocessor allow users to re-use the same gpio pins for different alternate functionalities. This is possible through a technique called pin-muxing. The Pin control (pinctrl ) subsystem allows managing pin muxing. The programmer should make a DT-pin-configuration-node entry and the pinctrl subsystem takes care of configuring those gpio pins for the intended alternate use. In our case, we want the pins to behave as SPI pins.
 
 ## Client driver
 
@@ -62,9 +62,14 @@ The image shows how probing happens in kernel drivers. When there a match betwee
 
 
 ## References
- - Linux Device Drivers Development (Book) by John Madieu.
 
- - https://lwn.net/Articles/448499/
+ * Platform bus, Platform driver:
+   * https://lwn.net/Articles/448499/
+   * Linux Device Drivers Development (Book) by John Madieu.
+  
+ * Device Tree:
+   * https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable/+/refs/tags/v4.19.79/Documentation/devicetree/bindings/spi/omap-spi.txt
 
- - How to create a patch? 
-    Book:  BeagleBone Cookbook (Page 492)
+   *  https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable/+/refs/tags/v4.19.79/Documentation/devicetree/bindings/iio/adc/mcp320x.txt
+
+
