@@ -21,23 +21,10 @@
 #define FIRST_MINOR 0
 #define MINOR_CNT 1
 
-MODULE_AUTHOR("Rajat Chaple, Sundar Krishnakumar");
+MODULE_AUTHOR("Rajat Chaple");
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_LICENSE("GPL v2");
 
-struct spi_data {
-	struct spi_device *spi;
-	struct spi_message msg;
-	struct spi_transfer transfer[1];
-	u8 tx_buf[2];
-	u8 rx_buf[2];
-	struct mutex lock;
-	/* Character Driver Files */
-	dev_t devt;
-	struct cdev cdev;
-	struct class *class;
-	struct device *adc_device;
-};
 
 /***********************************************************************************
  * adc char driver function for (userspace) open call
@@ -130,7 +117,11 @@ static struct file_operations driver_fops =
 
 ssize_t built_in_self_test_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
+	struct spi_data *data = dev_get_drvdata(dev);
 	PDEBUG("\n###### In %s ######\n", __func__);
+
+	PDEBUG("check: %d\n", data->tx_buf[0]);
+
 	return 0;
 }
 
@@ -203,13 +194,20 @@ static int my_adc_probe(struct spi_device *spi)
 {
 	struct spi_data *data;
 	int init_result;
-	struct device *dev_ret = NULL;
+	struct device *dev = NULL;
 
 	PDEBUG("\nInside spi client probe function\n");
 
 	// devm_kzalloc() is resource-managed kzalloc() 
 	// If we use devm_kzalloc() then no need to free this memory
 	data = devm_kzalloc(&spi->dev, sizeof(struct spi_data), GFP_KERNEL);
+
+	if(!data)
+	{
+		PDEBUG("Cannot allocate memory\n");
+		return -1;
+	}
+
 	data->spi = spi;
 
 	//Assigning the tx_buf and rx_buf of dummy_data to corresponding fields of transfer DS
@@ -242,9 +240,9 @@ static int my_adc_probe(struct spi_device *spi)
 		return -1;
 	}
 	//Createing the device file
-	dev_ret = device_create(data->class, NULL, data->devt, NULL, "spi%d", 0);
+	dev = device_create(data->class, NULL, data->devt, NULL, "spi%d", 0);
 
-	if (dev_ret == NULL)
+	if (dev == NULL)
 	{
 		PDEBUG("Device creation failed\n" );
 		class_destroy(data->class);
@@ -253,7 +251,7 @@ static int my_adc_probe(struct spi_device *spi)
 	}
 
 	// store the 'struct device' handle returned by device_create, in data->adc_device field
-	data->adc_device = dev_ret;
+	data->adc_device = dev;
 
 	init_result = adc_sysfs_create_files(data->adc_device);
 
@@ -264,7 +262,10 @@ static int my_adc_probe(struct spi_device *spi)
 		class_destroy(data->class);
 		unregister_chrdev_region(data->devt, 1);
 		return -1;
-	}	
+	}
+
+	// save private data pointer in platform device structure
+	dev_set_drvdata(data->adc_device, data);	
 	
 	cdev_init(&data->cdev, &driver_fops);
 
