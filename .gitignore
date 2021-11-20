@@ -8,3 +8,4 @@ crosstool-ng
 *.mod
 *.cmd
 *.ko
+*.mod.c
