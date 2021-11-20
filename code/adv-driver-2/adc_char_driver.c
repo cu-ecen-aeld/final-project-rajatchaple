@@ -121,6 +121,7 @@ ssize_t built_in_self_test_show(struct device *dev, struct device_attribute *att
 	PDEBUG("\n###### In %s ######\n", __func__);
 
 	PDEBUG("check: %d\n", data->tx_buf[0]);
+	PDEBUG("init_name: %s\n", dev->init_name);
 
 	return 0;
 }
