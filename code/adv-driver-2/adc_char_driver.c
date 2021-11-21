@@ -26,6 +26,56 @@ MODULE_LICENSE("Dual BSD/GPL");
 MODULE_LICENSE("GPL v2");
 
 
+ssize_t readx_show(struct spi_data *dev, u8 *tx_seq, u8 len, char *buf)
+{
+
+	uint16_t read_data = 0;
+	char adc_buffchar[10] = {0};
+	uint8_t buffchar_len = 0;
+	int err = -1;
+
+	if ( !(tx_seq != NULL && len == 2) )
+	{
+		return -1; // input param validation failed.
+	}	
+
+	mutex_lock(&dev->lock);
+
+	dev->tx_buf[0] = tx_seq[0];
+	dev->tx_buf[1] = tx_seq[1];
+
+	err = spi_sync(dev->spi, &dev->msg);
+
+	if (err < 0)
+	{
+		PDEBUG("spi_sync failed\n");
+		goto readx_show_return;
+	}
+
+	// Combine values to get the digital adc value.
+	read_data = ((dev->rx_buf[0] & 0x3U) << 8);
+	read_data |= (dev->rx_buf[1] & 0xFFU);	//reading 9th and th bit sent from SPI
+
+	sprintf(adc_buffchar, "%d\n", read_data);
+	buffchar_len = strlen(adc_buffchar);
+
+	// Exchanging the rx_buf data with user space 
+	if (copy_to_user(buf, adc_buffchar, buffchar_len))
+	{
+		PDEBUG("User space copy failed\n");
+		err =  -EFAULT;
+		goto readx_show_return;
+	}	
+
+	err = buffchar_len;
+
+readx_show_return:
+	mutex_unlock(&dev->lock);
+	return err;
+
+}
+
+
 /***********************************************************************************
  * adc char driver function for (userspace) open call
  * *********************************************************************************/
@@ -53,7 +103,7 @@ static ssize_t my_adc_read(struct file *f, char __user *buf, size_t len, loff_t 
 	int ret = -1;
 	char adc_buffchar[10] = {0};
 	uint8_t buffchar_len = 0;
-	unsigned int read_data = 0;
+	uint16_t read_data = 0;
 	int err = 0;
 
 	mutex_lock(&dev->lock);
@@ -115,60 +165,37 @@ static struct file_operations driver_fops =
 };
 
 
-ssize_t built_in_self_test_show(struct device *dev, struct device_attribute *attr, char *buf)
+ssize_t read0_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
+
+	u8 tx_seq[2] = {0x68, 0x00};
 	struct spi_data *data = dev_get_drvdata(dev);
 	PDEBUG("\n###### In %s ######\n", __func__);
 
-	PDEBUG("check: %d\n", data->tx_buf[0]);
-	PDEBUG("init_name: %s\n", dev->init_name);
+	return readx_show(data, tx_seq, 2, buf);
 
-	return 0;
 }
 
-ssize_t digital_output_show(struct device *dev, struct device_attribute *attr, char *buf)
+ssize_t read1_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
+	u8 tx_seq[2] = {0x78, 0x00};
+	struct spi_data *data = dev_get_drvdata(dev);
 	PDEBUG("\n###### In %s ######\n", __func__);
-	return 0;
-}
 
-ssize_t voltage_reading_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	PDEBUG("\n###### In %s ######\n", __func__);
-	return 0;
-}
-
-ssize_t reference_voltage_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	PDEBUG("\n###### In %s ######\n", __func__);
-	return 0;
-}
-
-ssize_t reference_voltage_store(struct device *dev, struct device_attribute *attr, 
-							 const char *buf, size_t count)
-{
-	PDEBUG("\n###### In %s ######\n", __func__);
-	return 0;
+	return readx_show(data, tx_seq, 2, buf);
 }
 
 /* Create sysfs atrributes of type struct device_attribute
  * NOTE: Use struct device_attribute and not struct attribute
  * only struct device_attribute has fields to add pointers to show & store methods
  */ 
-static DEVICE_ATTR(bist, S_IRUGO, built_in_self_test_show, NULL); // built in self test
-static DEVICE_ATTR(dig_op, S_IRUGO, digital_output_show, NULL); // adc digital output
-static DEVICE_ATTR(v_read, S_IRUGO, 
-				   voltage_reading_show, NULL); // adc voltage output
-												   // max value depends on ref voltage
-static DEVICE_ATTR(v_ref, S_IRUGO | S_IWUSR, reference_voltage_show, 
-				   reference_voltage_store); // reference voltage
+static DEVICE_ATTR(read0, S_IRUGO, read0_show, NULL); // adc digital output channel0
+static DEVICE_ATTR(read1, S_IRUGO, read1_show, NULL); // adc digital output channel1
 
 struct attribute *adc_attrs[] = 
 {
-	&dev_attr_bist.attr,
-	&dev_attr_dig_op.attr,
-	&dev_attr_v_read.attr,
-	&dev_attr_v_ref.attr,
+	&dev_attr_read0.attr,
+	&dev_attr_read1.attr,
 	NULL
 };
 
@@ -211,12 +238,12 @@ static int my_adc_probe(struct spi_device *spi)
 
 	data->spi = spi;
 
-	//Assigning the tx_buf and rx_buf of dummy_data to corresponding fields of transfer DS
+	// Assigning the tx_buf and rx_buf of dummy_data to corresponding fields of transfer DS
 	data->transfer[0].tx_buf = &data->tx_buf;
 	data->transfer[0].rx_buf = &data->rx_buf;
 	data->transfer[0].len = sizeof(data->tx_buf);
 
-	//Initializing the data->msg with transfer structures
+	// Initializing the data->msg with transfer structures
 	spi_message_init_with_transfers(&data->msg, 
 									data->transfer, 
 									ARRAY_SIZE(data->transfer));
@@ -270,7 +297,7 @@ static int my_adc_probe(struct spi_device *spi)
 	
 	cdev_init(&data->cdev, &driver_fops);
 
-	//Registering the file ops
+	// Registering the file ops
 	// last argument=1 The number of consecutive minor numbers.
 	init_result = cdev_add(&data->cdev, data->devt, 1);
 
