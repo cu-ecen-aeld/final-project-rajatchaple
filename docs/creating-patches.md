@@ -47,7 +47,7 @@ host$ git format-patch master --stdout > spi_no_idle.patch
 
 * If we inspect the file, we will see the changes that we made.
 
-Take a look at the spi_no_idle.patch file here - https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blob/master/base_external/patches/linux/spi_no_idle.patch
+Take a look at the completed spi_no_idle.patch file here - https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blob/master/base_external/patches/linux/spi_no_idle.patch
 
 
 ## Reference
