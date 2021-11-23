@@ -33,3 +33,5 @@ https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/adv-dri
 ![adv-driver-2](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/adv-driver-2.jpg)
 
 NOTE: low level driver implementation remains the as 'Advanced driver Part-1'. Syfs driver is imeplemented as part of the character driver. 
+
+MCP3002 has two ADC channels - CHNL0 and CHNL1 which which can be read as a regular file from the user space using the respective sysfs attributes - read0 and read1. The character driver implements the functionality of these attributes.
