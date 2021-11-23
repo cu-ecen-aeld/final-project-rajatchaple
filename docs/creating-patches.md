@@ -4,9 +4,7 @@ You have made a few changes to the kernel and you want to share them with your t
 
 ## How to create your own patch file?
 
-spi_no_idle.patch is a patch for disabling 'spi idling'. The creation of this patch will be used as an example below to describe how to create a patch file.
-
-Here are the steps:
+spi_no_idle.patch is a patch for disabling idling for the SPI HW module. We will be creating this patch file in a step by step process below-
 
 * Change directory to the repository that contains the linux source code.
 * Before making our changes, we should checkout a new branch.
