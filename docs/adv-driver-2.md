@@ -38,19 +38,25 @@ MCP3002 has two ADC channels - CHNL0 and CHNL1 which which can be read as a regu
 
 ## Generic python GUI
 File name: https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/gui/gen_python_gui.py
+
 This generic GUI is quite useful where display cannot be run or integrated on the embedded platform. The GUI has features to read sysfs driver data and display in intuitive form. This utility is developed keeping generic aaproach in mind as opposed to tightly bound application specific gui application developed using tkinter https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/gui/adc_gui.py
+
 
 ![gen_python_gui](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/gui.jpg)
 
 
 Application interacts with Beaglebone Black over serial using USB to TTL converter. Serial connections are as below. Blow diagram shows communication with MCP3002 chip.
 
+
 ![Connection-diagram](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/connection_diagram.JPG)
 
 
-The developed utility has been developed using pyqt platform and uses multithreading to schedule tasks. 
+The utility has been developed using pyqt platform and uses multithreading to schedule tasks. 
 Utiliy also includes mechanism to select COM port and send/receive data over selected serial port.
+
+
 ![GUI](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/gui.gif)
+
 
 This gui assumes that sysfs drivers are implemented. To use this application for I2C,
 1) Add I2C command inside init_continuous_write() similar to SPI0_CH0
