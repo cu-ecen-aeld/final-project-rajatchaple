@@ -43,7 +43,7 @@ This generic GUI is quite useful where display cannot be run or integrated on th
 ![gen_python_gui](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/gui.jpg)
 
 
-Application interacts with Beaglebone Black over serial. Serial connections are as below. Blow diagram shows communication with MCP3002 chip.
+Application interacts with Beaglebone Black over serial using USB to TTL converter. Serial connections are as below. Blow diagram shows communication with MCP3002 chip.
 
 ![Connection-diagram](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/connection_diagram.JPG)
 
