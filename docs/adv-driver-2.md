@@ -35,3 +35,18 @@ https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/code/adv-dri
 NOTE: low level driver implementation remains the as 'Advanced driver Part-1'. Syfs driver is imeplemented as part of the character driver. 
 
 MCP3002 has two ADC channels - CHNL0 and CHNL1 which which can be read as a regular file from the user space using the respective sysfs attributes - read0 and read1. The character driver implements the functionality of these attributes.
+
+## Generic python GUI
+
+![gen_python_gui](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/gen_python_gui.jpg)
+
+This generic GUI is useful where display cannot be run or integrated on the embedded platform. The GUI has features to read sysfs driver data and display in intuitive form. This utility is developed keeping generic aaproach in mind as opposed to tightly bound gui application developed using tkinter
+
+Applications interacts with Beaglebone Black over serial. Serial connections are as below.
+![Connection-diagram](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/connection_diagram.jpg)
+
+
+
+The developed utility has been developed using pyqt platform and uses multithreading to schedule tasks. 
+Utiliy also includes mechanism to select COM port and send/receive data over selected serial port.
+![GUI](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/gui.gif)
