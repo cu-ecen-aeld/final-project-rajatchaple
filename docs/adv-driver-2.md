@@ -58,7 +58,8 @@ Utiliy also includes mechanism to select COM port and send/receive data over sel
 ![GUI](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/gui.gif)
 
 
-This gui assumes that sysfs drivers are implemented. To use this application for I2C,
+This gui assumes that sysfs drivers are implemented. (However, dmesg logs can also be used to display reuired data over GUI with few changes)
+To use this application for I2C,
 1) Add I2C command inside init_continuous_write() similar to SPI0_CH0
 2) edit read_from_port() for the required data coversion 
 
