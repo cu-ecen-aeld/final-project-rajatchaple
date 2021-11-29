@@ -38,12 +38,12 @@ MCP3002 has two ADC channels - CHNL0 and CHNL1 which which can be read as a regu
 
 ## Generic python GUI
 
-![gen_python_gui](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/gen_python_gui.jpg)
+![gen_python_gui](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/gui.jpg)
 
 This generic GUI is useful where display cannot be run or integrated on the embedded platform. The GUI has features to read sysfs driver data and display in intuitive form. This utility is developed keeping generic aaproach in mind as opposed to tightly bound gui application developed using tkinter
 
 Applications interacts with Beaglebone Black over serial. Serial connections are as below.
-![Connection-diagram](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/connection_diagram.jpg)
+![Connection-diagram](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/connection_diagram.JPG)
 
 
 
