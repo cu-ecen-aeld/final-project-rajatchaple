@@ -1,4 +1,4 @@
-## About
+
 
 Single Board Computers (SBC) like BBB have capability to boot from external SD card. To automate the SD card preparation process for BBB and Buildroot Linux build environment, a bash script has been made.
 
