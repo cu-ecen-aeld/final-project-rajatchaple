@@ -18,7 +18,7 @@ ROOTFS partition contents: extracted contents from the rootfs.tar file.
 
 ## Script execution flow
 
-![script-execution-flow](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/usd-script-flow.jpg)
+![script-execution-flow](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/images/usd-script-flow-img.jpg)
 
 
 ## Script usage
