@@ -50,7 +50,20 @@ For best compatibility, we can enable all the drivers in this category.
 7. Save and exit the menuconfig and then do **make** from inside the buildroot directory, to perform the build.
 8. Once the build is complete, copy the contents to the SD card and test the image.
 9. Once the image boots, first login and then do **startx** from the BBB terminal to start the X server. 
- 
+
+The hdmi display may go to sleep if inactive for a longer time. To disable sleep, do the following-
+
+1. Go to /etc/X11/xorg.conf.d/ and create a new file 10-time.conf (Sometimes xorg.conf.d directory might be present in /usr/share/X11/ directory.)
+2. Paste the below contents in that file and re-run **startx**.
+```
+Section "ServerLayout"
+    Identifier "ServerLayout0"
+    Option "BlankTime"   "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime"     "0"
+EndSection
+```
 (The hdmi display will look similar to the image below.)
 
 ### Display
@@ -60,6 +73,8 @@ For best compatibility, we can enable all the drivers in this category.
 
 ### References
 
-
+* Buildroot - https://www.mcu.by/buildroot-bbb/
+* X11 setup - https://agentoss.wordpress.com/2011/03/06/building-a-tiny-x-org-linux-system-using-buildroot/
+* Sleep settings - https://forums.raspberrypi.com/viewtopic.php?t=232009
 
 
