@@ -10,7 +10,10 @@ git clone https://github.com/buildroot/buildroot.git
 
 
 1. Change to the buildroot directory, first do **make beaglebone_qt5_defconfig** and do **make menuconfig**.
-2. Inside menuconfig, under Toolchain section, enable the following (Press Spacebar to enable)-
+2. Inside menuconfig, under Toolchain section, enable the following-
+
+ (Press Spacebar to enable)
+ 
 ```
 Toolchain ->
 [X] Enable C++ support
@@ -53,7 +56,10 @@ For best compatibility, we can enable all the drivers in this category.
 
 The hdmi display may go to sleep if inactive for a longer time. To disable sleep, do the following-
 
-1. Go to /etc/X11/xorg.conf.d/ and create a new file 10-time.conf (Sometimes xorg.conf.d directory might be present in /usr/share/X11/ directory.)
+1. Go to /etc/X11/xorg.conf.d/ and create a new file named 10-time.conf 
+ 
+(Sometimes xorg.conf.d directory might be present in /usr/share/X11/ directory.)
+
 2. Paste the below contents in that file and re-run **startx**.
 ```
 Section "ServerLayout"
