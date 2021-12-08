@@ -72,7 +72,6 @@ EndSection
 
 ### References
 
-* Buildroot - https://www.mcu.by/buildroot-bbb/
 * X11 setup - https://agentoss.wordpress.com/2011/03/06/building-a-tiny-x-org-linux-system-using-buildroot/
 * Sleep settings - https://forums.raspberrypi.com/viewtopic.php?t=232009
 
