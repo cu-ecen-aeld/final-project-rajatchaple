@@ -43,7 +43,7 @@ For best compatibility, we can enable all the drivers in this category.
 [X] Enable ncurses (NOTE: ncurses is a needed dependency for xterm)
 ```
 
-7. Save and exit the menuconfig and then do **make** from inside the buildroot directory, to perform the build.
+7. Save and exit the menuconfig and perform the build (Make sure to do ./saveconfig.sh before doing ./build.sh).
 8. Once the build is complete, copy the contents to the SD card and test the image.
 9. Once the image boots, first login and then do **startx** from the BBB terminal to start the X server. 
 
