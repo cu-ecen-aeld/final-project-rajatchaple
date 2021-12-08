@@ -1,15 +1,8 @@
 To set up the HDMI display using X11 on a BeagleBoneBlack following are the steps-
 
-NOTE: This was tested using the latest version of buildroot. defconfig used: beaglebone_qt5_defconfig
+Follow instructions in the 'Setting up buildroot environment for BBB' section [here](https://github.com/cu-ecen-aeld/final-project-rajatchaple/blob/main/docs/setting-up-the-environment.md) to setup the buildroot environment for BeagleBoneBlack. NOTE: Make sure to use the defconfig names **beaglebone_qt5_defconfig** in the shared.sh file.
 
-Buildroot source: https://github.com/buildroot/buildroot.git
-
-```
-git clone https://github.com/buildroot/buildroot.git
-```
-
-
-1. Change to the buildroot directory, first do **make beaglebone_qt5_defconfig** and do **make menuconfig**.
+1. From the buildroot directory, do **make menuconfig**.
 2. Inside menuconfig, under Toolchain section, enable the following-
 
  (Press Spacebar to enable)
