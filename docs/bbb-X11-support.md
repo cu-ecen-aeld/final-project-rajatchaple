@@ -47,7 +47,7 @@ For best compatibility, we can enable all the drivers in this category.
 8. Next do ./build.sh. Once the build is complete, copy the contents to the SD card and test the image.
 9. Once the image boots, first login and then do **startx** from the BBB terminal to start the X server. 
 
-The hdmi display may go to sleep if inactive for a longer time. To disable sleep, do the following-
+The hdmi display may go to sleep if inactive for a long time. To disable sleep, do the following-
 
 1. Go to /etc/X11/xorg.conf.d/ and create a new file named 10-time.conf 
  
