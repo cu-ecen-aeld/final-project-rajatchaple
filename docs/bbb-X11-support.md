@@ -43,8 +43,8 @@ For best compatibility, we can enable all the drivers in this category.
 [X] Enable ncurses (NOTE: ncurses is a needed dependency for xterm)
 ```
 
-7. Save and exit the menuconfig and perform the build (Make sure to do ./saveconfig.sh before doing ./build.sh).
-8. Once the build is complete, copy the contents to the SD card and test the image.
+7. Save and exit the menuconfig and do ./saveconfig.sh from the buildroot directory. At this point, the external config file should like something like [this](https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blob/master/base_external/configs/aesd_bbb_qt5_defconfig).
+8. Next do ./build.sh. Once the build is complete, copy the contents to the SD card and test the image.
 9. Once the image boots, first login and then do **startx** from the BBB terminal to start the X server. 
 
 The hdmi display may go to sleep if inactive for a longer time. To disable sleep, do the following-
