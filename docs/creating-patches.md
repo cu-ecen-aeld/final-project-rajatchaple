@@ -1,10 +1,22 @@
-## Why do you want to create a patch file?
+## Kernel and Device Tree modifications for BeagleBoneBlack SPI support  
 
-You have made a few changes to the kernel and you want to share them with your team members, you can create something called a patch file that contains the just the changes you have made.
+***spi_no_idle.patch*** - https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blob/master/base_external/patches/linux/spi_no_idle.patch
 
-## How to create your own patch file?
+Info: https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/issues/13
 
-spi_no_idle.patch is a patch for disabling idling for the SPI HW module. We will be creating this patch file in a step by step process below-
+***devtree.patch*** - https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blob/master/base_external/patches/linux/devtree.patch
+
+Info: https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/issues/12
+
+
+
+
+
+***What is .patch file?*** You have made a few changes to the kernel and you want to share them with your team members, you can create something called a patch file that contains the just the changes you have made.
+
+***Creating your own patch file***
+
+spi_no_idle.patch creation is shown in a step-by-step manner below. Similar steps can be followed to create patch files for any new kernel modifications.
 
 * Change directory to the repository that contains the linux source code.
 * Before making our changes, we should checkout a new branch.
@@ -47,19 +59,8 @@ host$ git format-patch master --stdout > spi_no_idle.patch
 
 * If we inspect the file, we will see the changes that we made.
 
-Take a look at some completed patch files here- 
-
-***spi_no_idle.patch*** - https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blob/master/base_external/patches/linux/spi_no_idle.patch
-
-Info: https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/issues/13
-
-***devtree.patch*** - https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/blob/master/base_external/patches/linux/devtree.patch
-
-Info: https://github.com/cu-ecen-aeld/final-project-SundarKrishnakumar/issues/12
 
 
 
 
-## Reference
 
- * Book:  BeagleBone Cookbook (Page 492)
