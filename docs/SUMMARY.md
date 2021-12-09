@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Preface](README.md)
-* [1. Creating patch files](creating-patches.md)
+* [1. Creating patch files](bbb-spi-support.md)
 * [2. Setting up the environment](setting-up-the-environment.md)
 * [3. A script to prepare Micro SD Card (Buildroot & BBB environment)](prepare-sdcard.md)
 * [4. BeagleBoneBlack X11 support](bbb-X11-support.md)
